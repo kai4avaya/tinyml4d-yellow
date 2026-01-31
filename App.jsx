@@ -111,26 +111,29 @@ const navLinks = [
 
 const Navigation = () => {
   return (
-    <nav className="fixed bottom-8 left-8 z-40 hidden md:block">
-      <ul className="flex flex-col gap-3">
-        {navLinks.map((link) => (
-          <motion.li 
-            key={link.name}
-            whileHover={{ x: 5 }}
-            className="group cursor-pointer flex items-center gap-2"
-          >
-            <span className="font-serif text-lg text-stone-600 group-hover:text-black transition-colors">
-              {link.name}
-            </span>
-            
-            {link.hasNew && (
-              <span className="bg-yellow-200 text-[10px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wider text-yellow-800">
-                New
+    <nav className="fixed bottom-8 left-4 right-4 sm:left-8 sm:right-auto z-40">
+      <div className="relative px-4 py-3 overflow-hidden bg-white border border-stone-200 rounded-lg sm:bg-transparent sm:border-0 sm:p-0">
+        <div className="absolute inset-y-0 right-0 w-12 pointer-events-none bg-gradient-to-l from-white to-transparent sm:hidden"></div>
+        <ul className="flex flex-row flex-nowrap overflow-x-auto whitespace-nowrap hide-scrollbar justify-start space-x-6 text-base font-serif sm:flex-col sm:space-x-0 sm:space-y-4 sm:text-xl">
+          {navLinks.map((link) => (
+            <motion.li 
+              key={link.name}
+              whileHover={{ x: 5 }}
+              className="group cursor-pointer flex items-center gap-2 flex-shrink-0"
+            >
+              <span className="text-stone-600 group-hover:text-stone-900 transition-colors">
+                {link.name}
               </span>
-            )}
-          </motion.li>
-        ))}
-      </ul>
+              
+              {link.hasNew && (
+                <span className="ml-1 inline align-middle text-[10px] text-yellow-800 uppercase tracking-widest font-sans font-bold bg-yellow-100 px-2 py-0.5 rounded-full">
+                  New
+                </span>
+              )}
+            </motion.li>
+          ))}
+        </ul>
+      </div>
     </nav>
   );
 };
