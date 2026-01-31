@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Scroll Microcontroller</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: transparent; /* Transparent body */
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Make the body very tall to enable scrolling */
+            height: 500vh;
+            overflow-x: hidden;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            /* Removed radial gradient for full transparency */
+            background: none; 
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <!-- Import Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // --- 1. Scene Setup ---
+        const scene = new THREE.Scene();
+        // Removed fog to allow full transparency
+        // scene.fog = new THREE.FogExp2(0x050505, 0.02);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 8, 12);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setClearColor( 0x000000, 0 ); // Explicit transparency
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // --- 2. Lighting ---
+        // High ambient light to ensure everything is well lit from all angles
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
+        scene.add(ambientLight);
+
+        // Hemisphere light provides soft, uniform lighting from the sky and ground
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0xbbbbbb, 1.0);
+        scene.add(hemiLight);
+
+        // Reduced directional light to minimize harsh shadows and glare
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.3);
+        dirLight.position.set(5, 10, 7);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 1024;
+        dirLight.shadow.mapSize.height = 1024;
+        scene.add(dirLight);
+
+        // Kept colored lights very subtle
+        const blueLight = new THREE.PointLight(0x0088ff, 0.2);
+        blueLight.position.set(-5, 2, -5);
+        scene.add(blueLight);
+
+        const orangeLight = new THREE.PointLight(0xff8800, 0.2);
+        orangeLight.position.set(5, 2, 5);
+        scene.add(orangeLight);
+
+        // --- 3. Procedural Microcontroller Construction ---
+        
+        // Group to hold all board parts
+        const boardGroup = new THREE.Group();
+        scene.add(boardGroup);
+
+        // -- Materials --
+        
+        // Function to create a circuit trace texture
+        function createCircuitTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+
+            // Fill background (dark green/blue)
+            ctx.fillStyle = '#002a18'; 
+            ctx.fillRect(0, 0, 512, 1024);
+
+            // Draw traces
+            ctx.strokeStyle = '#005530';
+            ctx.lineWidth = 4;
+            
+            for(let i=0; i<40; i++) {
+                ctx.beginPath();
+                const x = Math.random() * 512;
+                const y = Math.random() * 1024;
+                ctx.moveTo(x, y);
+                // Draw random path
+                let cx = x;
+                let cy = y;
+                for(let j=0; j<3; j++) {
+                    if(Math.random()>0.5) cx += (Math.random()-0.5) * 200;
+                    else cy += (Math.random()-0.5) * 200;
+                    ctx.lineTo(cx, cy);
+                }
+                ctx.stroke();
+            }
+
+            // Draw pads
+            ctx.fillStyle = '#b8860b'; // Gold
+            for(let i=0; i<30; i++) {
+                ctx.beginPath();
+                ctx.arc(Math.random() * 512, Math.random() * 1024, 3, 0, Math.PI*2);
+                ctx.fill();
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            return texture;
+        }
+
+        // Increased roughness on materials to remove "shine" (specular highlights)
+        const pcbMaterial = new THREE.MeshStandardMaterial({
+            color: 0x004422,
+            roughness: 0.9, // Matte
+            metalness: 0.0,
+            map: createCircuitTexture(),
+        });
+
+        const blackPlasticMat = new THREE.MeshStandardMaterial({
+            color: 0x111111,
+            roughness: 0.9, // Matte
+            metalness: 0.0
+        });
+
+        const metalSilverMat = new THREE.MeshStandardMaterial({
+            color: 0xcccccc,
+            roughness: 0.7, // Brushed metal look, less shiny
+            metalness: 0.5
+        });
+
+        const metalGoldMat = new THREE.MeshStandardMaterial({
+            color: 0xffcc00,
+            roughness: 0.7,
+            metalness: 0.5
+        });
+
+        const ledOffMat = new THREE.MeshStandardMaterial({
+            color: 0x550000,
+            emissive: 0x220000
+        });
+
+        // -- Components --
+
+        // 1. PCB Board Base
+        const boardWidth = 4;
+        const boardLength = 6.5;
+        const boardHeight = 0.1;
+        const pcbGeo = new THREE.BoxGeometry(boardWidth, boardHeight, boardLength);
+        const pcb = new THREE.Mesh(pcbGeo, pcbMaterial);
+        pcb.castShadow = true;
+        pcb.receiveShadow = true;
+        boardGroup.add(pcb);
+
+        // 2. Main MCU Chip (Center rotated 45 deg)
+        const chipGeo = new THREE.BoxGeometry(1.5, 0.15, 1.5);
+        const chip = new THREE.Mesh(chipGeo, blackPlasticMat);
+        chip.position.y = boardHeight/2 + 0.075;
+        chip.rotation.y = Math.PI / 4;
+        chip.castShadow = true;
+        boardGroup.add(chip);
+
+        // MCU Pins
+        const pinCount = 10;
+        const pinGeo = new THREE.BoxGeometry(0.05, 0.05, 0.3);
+        for(let s=0; s<4; s++) { // 4 sides
+            const sideGroup = new THREE.Group();
+            sideGroup.rotation.y = s * (Math.PI/2) + (Math.PI/4);
+            sideGroup.position.y = boardHeight/2 + 0.05;
+            
+            for(let i=0; i<pinCount; i++) {
+                const pin = new THREE.Mesh(pinGeo, metalSilverMat);
+                // Position along the edge of the chip
+                pin.position.x = (i - (pinCount-1)/2) * 0.12;
+                pin.position.z = 0.8; // Distance from center
+                sideGroup.add(pin);
+            }
+            boardGroup.add(sideGroup);
+        }
+
+        // 3. USB Connector (Top Edge)
+        const usbGeo = new THREE.BoxGeometry(1.2, 0.5, 1);
+        const usb = new THREE.Mesh(usbGeo, metalSilverMat);
+        usb.position.set(0, 0.25, -boardLength/2 + 0.5);
+        usb.castShadow = true;
+        boardGroup.add(usb);
+
+        // 4. Pin Headers (Sides)
+        const headerPlasticGeo = new THREE.BoxGeometry(0.5, 0.5, boardLength - 1);
+        const headerPinGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.3, 8);
+        
+        [-1, 1].forEach(side => {
+            // Black plastic strip
+            const header = new THREE.Mesh(headerPlasticGeo, blackPlasticMat);
+            header.position.set(side * (boardWidth/2 - 0.4), 0.25, 0);
+            header.castShadow = true;
+            boardGroup.add(header);
+
+            // Holes/Pins inside header
+            for(let i=0; i<15; i++) {
+                const hPin = new THREE.Mesh(headerPinGeo, metalGoldMat);
+                hPin.position.set(side * (boardWidth/2 - 0.4), 0.4, (i - 7) * 0.35);
+                boardGroup.add(hPin);
+            }
+        });
+
+        // 5. Random Components (Resistors/Capacitors)
+        const compGeo = new THREE.BoxGeometry(0.1, 0.1, 0.2);
+        for(let i=0; i<20; i++) {
+            const mat = Math.random() > 0.5 ? blackPlasticMat : metalSilverMat;
+            const comp = new THREE.Mesh(compGeo, mat);
+            
+            // Random position, avoiding center and edges roughly
+            const x = (Math.random() - 0.5) * (boardWidth - 2);
+            const z = (Math.random() - 0.5) * (boardLength - 3);
+            
+            comp.position.set(x, boardHeight/2 + 0.05, z);
+            comp.rotation.y = Math.random() > 0.5 ? Math.PI/2 : 0;
+            boardGroup.add(comp);
+        }
+
+        // 6. WiFi Module Antenna (Golden Squiggly line)
+        // We'll simulate this with a small textured plane at the bottom
+        const antennaGeo = new THREE.PlaneGeometry(1, 1);
+        const antennaCanvas = document.createElement('canvas');
+        antennaCanvas.width = 128; 
+        antennaCanvas.height = 128;
+        const actx = antennaCanvas.getContext('2d');
+        actx.fillStyle = '#004422';
+        actx.fillRect(0,0,128,128);
+        actx.strokeStyle = '#d4af37';
+        actx.lineWidth = 5;
+        actx.beginPath();
+        // Draw zig zag
+        for(let i=10; i<118; i+=10) {
+            actx.moveTo(10, i);
+            actx.lineTo(118, i);
+            if(i < 110) actx.lineTo(118, i+5);
+            actx.lineTo(10, i+5);
+        }
+        actx.stroke();
+        
+        const antennaMat = new THREE.MeshStandardMaterial({
+            map: new THREE.CanvasTexture(antennaCanvas),
+            roughness: 0.4,
+            metalness: 0.6,
+        });
+        const antenna = new THREE.Mesh(antennaGeo, antennaMat);
+        antenna.rotation.x = -Math.PI/2;
+        antenna.position.set(0, boardHeight/2 + 0.01, boardLength/2 - 0.8);
+        boardGroup.add(antenna);
+
+        // --- 4. Animation & Scroll Logic ---
+
+        let scrollPercent = 0;
+        
+        // Listen to scroll
+        function updateScroll() {
+            const h = document.documentElement; 
+            const b = document.body;
+            const st = 'scrollTop';
+            const sh = 'scrollHeight';
+            
+            // Calculate percentage (0 to 1)
+            scrollPercent = (h[st]||b[st]) / ((h[sh]||b[sh]) - h.clientHeight);
+        }
+
+        window.addEventListener('scroll', updateScroll);
+        window.addEventListener('resize', onWindowResize, false);
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // Target rotations
+        let targetRotX = 0.5; // Initial tilt
+        let targetRotY = 0;
+        let targetRotZ = 0;
+
+        // Blinking LED Logic
+        const ledGeo = new THREE.BoxGeometry(0.1, 0.05, 0.1);
+        const led = new THREE.Mesh(ledGeo, ledOffMat);
+        led.position.set(1.5, boardHeight/2 + 0.05, -2);
+        boardGroup.add(led);
+        
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // 1. Calculate target rotation based on scroll
+            // Full spin (2*PI) over the course of the scroll, plus some extra
+            targetRotY = scrollPercent * Math.PI * 4; 
+            
+            // Tilt the board back and forth slightly as we scroll
+            targetRotX = 0.5 + Math.sin(scrollPercent * Math.PI * 2) * 0.3;
+            
+            // Sway left/right slightly
+            targetRotZ = Math.cos(scrollPercent * Math.PI * 2) * 0.2;
+
+            // 2. Smoothly interpolate current rotation to target (Damping)
+            const damping = 0.05;
+            boardGroup.rotation.y += (targetRotY - boardGroup.rotation.y) * damping;
+            boardGroup.rotation.x += (targetRotX - boardGroup.rotation.x) * damping;
+            boardGroup.rotation.z += (targetRotZ - boardGroup.rotation.z) * damping;
+
+            // 3. Move camera slightly based on mouse? (Optional polish)
+            // Just keeping it centered for now to focus on the scroll effect.
+            
+            // Blink LED
+            const time = Date.now() * 0.005;
+            const blink = Math.sin(time) > 0.8 ? 0xff0000 : 0x330000;
+            led.material.emissive.setHex(blink);
+
+            renderer.render(scene, camera);
+        }
+
+        // Initial setup
+        boardGroup.rotation.x = 0.5;
+        animate();
+
+    </script>
+</body>
+</html>
