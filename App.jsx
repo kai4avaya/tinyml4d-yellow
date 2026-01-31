@@ -505,16 +505,73 @@ const Footer = () => {
     );
 }
 
-const Header = () => (
-  <header className="fixed top-8 left-8 z-40">
-    <h1 className="font-serif text-xl text-stone-700 tracking-wide">
-      TinyML 4D
-    </h1>
-    <p className="text-xs font-sans text-stone-400 mt-1 tracking-widest uppercase">
-      Learn. Build. Share. Together.
-    </p>
-  </header>
-);
+const Header = () => {
+  const [isVisible, setIsVisible] = useState(true);
+  const [hasScrolled, setHasScrolled] = useState(false);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Show header at top of page
+      if (currentScrollY < 50) {
+        setIsVisible(true);
+        setHasScrolled(false);
+        lastScrollY.current = currentScrollY;
+        return;
+      }
+      
+      setHasScrolled(true);
+      
+      // Determine scroll direction
+      const scrollDelta = currentScrollY - lastScrollY.current;
+      
+      // Scrolling down - hide header
+      if (scrollDelta > 0 && isVisible) {
+        setIsVisible(false);
+      }
+      // Scrolling up - show header
+      else if (scrollDelta < 0 && !isVisible) {
+        setIsVisible(true);
+      }
+      
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isVisible]);
+
+  return (
+    <motion.header
+      initial={{ opacity: 1, y: 0 }}
+      animate={{ 
+        opacity: isVisible ? 1 : 0,
+        y: isVisible ? 0 : -20
+      }}
+      transition={{ 
+        duration: 0.4,
+        ease: [0.4, 0, 0.2, 1]
+      }}
+      className="fixed top-8 left-8 z-40 pointer-events-none"
+    >
+      <motion.div
+        animate={{
+          opacity: hasScrolled && isVisible ? 1 : 1
+        }}
+        className="pointer-events-auto"
+      >
+        <h1 className="font-serif text-xl text-stone-700 tracking-wide">
+          TinyML 4D
+        </h1>
+        <p className="text-xs font-sans text-stone-400 mt-1 tracking-widest uppercase">
+          Learn. Build. Share. Together.
+        </p>
+      </motion.div>
+    </motion.header>
+  );
+};
 
 const MobileMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
