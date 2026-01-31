@@ -114,7 +114,7 @@ const Navigation = () => {
     <nav className="fixed bottom-8 left-4 right-4 sm:left-8 sm:right-auto z-40">
       <div className="relative px-4 py-3 overflow-hidden bg-white border border-stone-200 rounded-lg sm:bg-transparent sm:border-0 sm:p-0">
         <div className="absolute inset-y-0 right-0 w-12 pointer-events-none bg-gradient-to-l from-white to-transparent sm:hidden"></div>
-        <ul className="flex flex-row flex-nowrap overflow-x-auto whitespace-nowrap hide-scrollbar justify-start space-x-6 text-base font-serif sm:flex-col sm:space-x-0 sm:space-y-4 sm:text-xl">
+        <ul className="flex flex-row flex-nowrap overflow-x-auto whitespace-nowrap hide-scrollbar justify-start space-x-6 text-base font-display sm:flex-col sm:space-x-0 sm:space-y-4 sm:text-xl">
           {navLinks.map((link) => (
             <motion.li 
               key={link.name}
@@ -158,7 +158,7 @@ const Counter = ({ from, to, duration = 2, suffix = "" }) => {
     }
   }, [from, to, duration, inView, suffix]);
 
-  return <span ref={nodeRef} className="font-serif text-4xl md:text-5xl text-stone-800" />;
+  return <span ref={nodeRef} className="font-heading text-4xl md:text-5xl text-stone-800" />;
 };
 
 const StatsBlock = ({ data }) => {
@@ -268,7 +268,7 @@ const HorizontalScrollCarousel = ({ content }) => {
                initial={{ opacity: 0, y: 20 }}
                whileInView={{ opacity: 1, y: 0 }}
                transition={{ duration: 0.8 }}
-               className="font-serif text-3xl md:text-5xl text-stone-800 mb-2"
+               className="font-heading text-3xl md:text-5xl text-stone-800 mb-2"
              >
                {content.title}
              </motion.h2>
@@ -297,7 +297,7 @@ const HorizontalScrollCarousel = ({ content }) => {
                    <div className="absolute inset-0 bg-stone-900/10 group-hover:bg-transparent transition-colors" />
                 </div>
                 <div className="h-1/3 p-6 flex flex-col justify-center bg-white relative z-20">
-                   <h3 className="font-serif text-2xl text-stone-800 mb-3">{item.title}</h3>
+                   <h3 className="font-heading text-2xl text-stone-800 mb-3">{item.title}</h3>
                    <p className="font-sans text-stone-500 text-sm leading-relaxed">
                      {item.body}
                    </p>
@@ -310,7 +310,7 @@ const HorizontalScrollCarousel = ({ content }) => {
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 1 }}
-                className="font-serif text-2xl md:text-4xl text-stone-800 text-center leading-relaxed"
+                className="font-heading text-2xl md:text-4xl text-stone-800 text-center leading-relaxed"
               >
                 {content.tagline}
               </motion.p>
@@ -353,7 +353,7 @@ const ContentBlock = ({ align = "right", type = "text", content, index }) => {
 
             {/* Content Side */}
             <div className={`order-2 ${align === "right" ? "md:order-1 md:text-right" : "md:order-2"}`}>
-                <h2 className="font-serif text-3xl md:text-4xl text-stone-800 mb-6 leading-tight">
+                <h2 className="font-heading text-3xl md:text-4xl text-stone-800 mb-6 leading-tight">
                     {content.heading}
                 </h2>
                 <p className="font-sans text-stone-500 leading-relaxed mb-6">
@@ -361,9 +361,9 @@ const ContentBlock = ({ align = "right", type = "text", content, index }) => {
                 </p>
                 <div className="mb-8">
                     <p className="text-xs uppercase tracking-widest text-stone-400 mb-2">Supported By</p>
-                    <p className="font-serif text-stone-700">{content.supporters}</p>
+                    <p className="font-heading text-stone-700">{content.supporters}</p>
                 </div>
-                <button className="px-8 py-3 rounded-sm font-serif text-lg bg-stone-800 text-stone-50 hover:bg-stone-700 transition-all border border-stone-800">
+                <button className="px-8 py-3 rounded-sm font-heading text-lg bg-stone-800 text-stone-50 hover:bg-stone-700 transition-all border border-stone-800">
                     {content.cta}
                 </button>
             </div>
@@ -396,7 +396,7 @@ const ContentBlock = ({ align = "right", type = "text", content, index }) => {
                  </div>
                  <div className={`flex flex-wrap gap-4 ${align === 'left' ? 'justify-start' : align === 'center' ? 'justify-center' : 'justify-end'}`}>
                    {content.buttons.map((btn, i) => (
-                     <button key={i} className={`px-8 py-3 rounded-sm font-serif text-lg transition-all border ${btn.primary ? 'bg-stone-800 border-stone-800 text-stone-50 hover:bg-stone-700' : 'border-stone-300 text-stone-600 hover:border-stone-800 hover:text-stone-900 bg-transparent'}`}>
+                     <button key={i} className={`px-8 py-3 rounded-sm font-heading text-lg transition-all border ${btn.primary ? 'bg-stone-800 border-stone-800 text-stone-50 hover:bg-stone-700' : 'border-stone-300 text-stone-600 hover:border-stone-800 hover:text-stone-900 bg-transparent'}`}>
                        {btn.label}
                      </button>
                    ))}
@@ -406,7 +406,7 @@ const ContentBlock = ({ align = "right", type = "text", content, index }) => {
           <StatsBlock data={content} />
         ) : (
           <div className="prose prose-lg prose-stone">
-             <h2 className="font-serif text-3xl md:text-4xl text-stone-800 mb-6 leading-tight">
+             <h2 className="font-heading text-3xl md:text-4xl text-stone-800 mb-6 leading-tight">
                {content.heading}
              </h2>
              <p className="font-sans text-stone-500 leading-relaxed">
@@ -428,7 +428,7 @@ const Footer = () => {
                 
                 {/* 1. Newsletter */}
                 <div className="flex flex-col gap-6">
-                    <h3 className="font-serif text-2xl text-stone-900">Newsletter</h3>
+                    <h3 className="font-heading text-2xl text-stone-900">Newsletter</h3>
                     <p className="text-sm text-stone-500">
                         Get the latest ML Systems insights & updates delivered to your inbox.
                     </p>
@@ -438,7 +438,7 @@ const Footer = () => {
                             placeholder="email@address.com" 
                             className="bg-white/50 border border-stone-300 p-3 rounded-sm text-stone-900 focus:outline-none focus:border-stone-800 transition-colors placeholder:text-stone-400"
                         />
-                        <button className="flex items-center justify-center gap-2 bg-stone-900 hover:bg-stone-700 text-stone-50 p-3 rounded-sm font-serif transition-colors">
+                        <button className="flex items-center justify-center gap-2 bg-stone-900 hover:bg-stone-700 text-stone-50 p-3 rounded-sm font-heading transition-colors">
                             <span>Subscribe</span>
                             <ArrowUpRight size={16} />
                         </button>
@@ -448,7 +448,7 @@ const Footer = () => {
 
                 {/* 2. Contact Form */}
                 <div className="flex flex-col gap-6">
-                    <h3 className="font-serif text-2xl text-stone-900">Contact Us</h3>
+                    <h3 className="font-heading text-2xl text-stone-900">Contact Us</h3>
                     <form className="flex flex-col gap-4">
                         <input 
                             type="text" 
@@ -473,7 +473,7 @@ const Footer = () => {
 
                 {/* 3. Secondary Links */}
                 <div className="flex flex-col gap-6 md:items-end">
-                    <h3 className="font-serif text-2xl text-stone-900">Links</h3>
+                    <h3 className="font-heading text-2xl text-stone-900">Links</h3>
                     <ul className="flex flex-col gap-4 md:items-end">
                         <li>
                             <a href="#" className="flex items-center gap-2 text-stone-500 hover:text-stone-900 transition-colors">
@@ -502,7 +502,7 @@ const Footer = () => {
 
             <div className="mt-24 pt-8 border-t border-stone-200 flex flex-col md:flex-row justify-between items-center text-xs text-stone-400 gap-4">
                 <span>&copy; 2026 TinyML 4D. All rights reserved.</span>
-                <span className="font-serif italic text-stone-500">Built for the future of AI.</span>
+                <span className="font-heading italic text-stone-500">Built for the future of AI.</span>
             </div>
         </footer>
     );
@@ -565,7 +565,7 @@ const Header = () => {
         }}
         className="pointer-events-auto"
       >
-        <h1 className="font-serif text-xl text-stone-700 tracking-wide">
+        <h1 className="font-heading text-xl text-stone-700 tracking-wide">
           TinyML 4D
         </h1>
         <p className="text-xs font-sans text-stone-400 mt-1 tracking-widest uppercase">
@@ -584,7 +584,7 @@ const MobileMenu = () => {
       <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md p-4 border-t border-stone-100 md:hidden z-50 flex justify-between items-center">
         <button 
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 font-serif text-stone-800"
+          className="flex items-center gap-2 font-heading text-stone-800"
         >
           {isOpen ? <X size={18} /> : <MenuIcon size={18} />}
           <span>{isOpen ? 'Close' : 'Menu'}</span>
@@ -614,7 +614,7 @@ const MobileMenu = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 }}
-                  className="text-3xl font-serif text-stone-800"
+                  className="text-3xl font-heading text-stone-800"
                   onClick={() => setIsOpen(false)}
                 >
                   {link.name}

@@ -6,7 +6,12 @@ export default {
     "./SensorScene.jsx",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'display': ['"DM Sans"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+        'heading': ['"Space Grotesk"', '"DM Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 }
