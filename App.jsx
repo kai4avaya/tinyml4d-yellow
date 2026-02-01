@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionValue, useTime, AnimatePresence, useInView, animate } from 'framer-motion';
 import { ArrowUpRight, X, Menu as MenuIcon, Send, Mail, Github, Heart } from 'lucide-react';
 import SensorScene from './SensorScene';
+import FlowerScene from './FlowerScene';
+import FlowerEndScene from './FlowerEndScene';
+import CursorPixels from './CursorPixels';
 
 // --- Components ---
 
@@ -631,6 +634,13 @@ const MobileMenu = () => {
 // --- Main App Component ---
 
 export default function App() {
+  const [showSensor, setShowSensor] = useState(false);
+  
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setShowSensor(params.has('sensor'));
+  }, []);
+  
   const sections = [
     {
       type: "text",
@@ -716,6 +726,9 @@ export default function App() {
       
       {/* 1. Background Layer */}
       <SunBackground />
+      
+      {/* Mouse-following pixel effect */}
+      <CursorPixels />
 
       {/* 2. Fixed UI Layer */}
       <Header />
@@ -739,8 +752,14 @@ export default function App() {
       {/* 4. Footer Layer */}
       <Footer />
 
-      {/* 5. Sensor Scene Layer */}
-      <SensorScene />
+      {/* 5. Flower Animation - blooms during scroll on yellow background */}
+      {!showSensor && <FlowerScene />}
+
+      {/* 6. Final Scene - blue gradient with bloomed flower */}
+      {!showSensor && <FlowerEndScene />}
+
+      {/* Alternative: Sensor Scene */}
+      {showSensor && <SensorScene />}
       
     </div>
   );
