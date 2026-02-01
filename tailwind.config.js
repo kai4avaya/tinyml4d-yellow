@@ -9,7 +9,7 @@ export default {
     extend: {
       fontFamily: {
         'display': ['"DM Sans"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
-        'heading': ['"Outfit"', '"DM Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        'heading': ['"Manrope"', '"DM Sans"', 'system-ui', '-apple-system', 'sans-serif'],
       },
     },
   },
